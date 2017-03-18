@@ -4,7 +4,7 @@ import scipy.io.wavfile as scw
 import os
 import scipy
 from scipy.spatial.distance import euclidean
-import soundfile
+import soundfile as sf
 
 SONG_POOL = ""
 LIMIT = 0.25
@@ -27,7 +27,7 @@ def gen_model(song):
     return decimate(fft1.tolist(), N)
 
 def freq1_from_ogg_path(path):
-    raw = scw.read(path)[1][:,1]
+    raw = sf.read(path)[0][:,1]
     fft = np.absolute(stft(raw, 32768, 2)).mean(axis=0)
     fft /= max(fft)
     return decimate(fft.tolist(), N)
@@ -40,16 +40,33 @@ def decimate(old, n):
     old = old + [0]*rest
     return [np.mean(old[i-per_bin:i]) for i in range(per_bin, len(old), per_bin)]
 
-if __name__ == "__main__":
-    raw1 = scw.read(sys.argv[1])[1][:,1]
-    raw2 = scw.read(sys.argv[2])[1][:,1]
-    print ("normal: " + str(sim(raw1, raw2)))
-    print ("vol change:" + str(sim(raw1*0.1, raw2)))
-    print ("s1 selber: " + str(sim(raw1, raw1)))
-    print ("s2 selber: " + str(sim(raw2, raw2)))
-    print ("s1 ausschnitt: " + str(sim(raw1, raw1[0:int(len(raw1)/2)])))
-    print ("s2 ausschnitt: " + str(sim(raw2, raw2[0:int(len(raw2)/2)])))
+def load_model(path):
+    temp = []
+    with open(path, 'r') as f:
+        temp = f.readlines()
 
+    names = []
+    vals = []
+    for line in temp:
+        s = line.split("|")
+        names.append(s[0].split("/")[-1])
+        vals.append([float(val) for val in s[1].split(" ")])
+
+    return names, vals
+
+def predict(model, song):
+    distances = []
+    for s in model:
+        distances.append(euclidean(s, song))
+
+    return distances.index(min(distances))
+
+
+if __name__ == "__main__":
+    sample = freq1_from_ogg_path(sys.argv[1])
+    names, model = load_model("../model/" + sys.argv[2])
+
+    print (names[predict(model, sample)])
     # path = sys.argv[1]
     # sample_rate, raw = scw.read(path)
     #

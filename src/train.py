@@ -18,6 +18,8 @@ class Training(object):
             freq1 = freq1_from_ogg_path(fname)
             with open(self.output_file, 'a') as f:
                 f.write(fname + "|" + " ".join(map(str, freq1)) + "\n")
+            print (fname + " done")
+
 
 if __name__ == "__main__":
     t = Training(sys.argv[1], sys.argv[2])
