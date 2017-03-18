@@ -4,9 +4,10 @@ import scipy.io.wavfile as scw
 import os
 import scipy
 from scipy.spatial.distance import euclidean
+import soundfile
 
 SONG_POOL = ""
-LIMIT = 0.5
+LIMIT = 0.25
 N = 200
 
 def stft(x, fftsize, overlap):
@@ -18,13 +19,18 @@ def stft(x, fftsize, overlap):
 
 
 def sim(s1, s2):
-    fft1 = np.absolute(stft(s1, 32768, 2)).mean(axis=0)
-    fft2 = np.absolute(stft(s2, 32768, 2)).mean(axis=0)
+    return euclidean(gen_model(s1), gen_model(s2))
+
+def gen_model(song):
+    fft1 = np.absolute(stft(song, 32768, 2)).mean(axis=0)
     fft1 /= max(fft1)
-    fft2 /= max(fft2)
-    ds1 = decimate(fft1.tolist(), N)
-    ds2 = decimate(fft2.tolist(), N)
-    return euclidean(ds1, ds2)
+    return decimate(fft1.tolist(), N)
+
+def freq1_from_ogg_path(path):
+    raw = scw.read(path)[1][:,1]
+    fft = np.absolute(stft(raw, 32768, 2)).mean(axis=0)
+    fft /= max(fft)
+    return decimate(fft.tolist(), N)
 
 def decimate(old, n):
     # lol
