@@ -1,0 +1,12 @@
+- 10 Songs als Basis in Ordnung
+- Testskript schreiben, dass Training und Evaluation übernimmt
+    -> Parameter in den Basisskripten enden -> easy Evaluation mit Ausführung des Testskripts
+
+- Testumgebung muss eingerichtet werden
+    - setup_test.py
+    - Erstellen von Variation der 10 Basissongs
+        - verschiedene Lautstärken
+        - verschiedene Ausschnitte
+        (- verschieden mit Rauschen überlagert)
+        - verschiedene Bitrates
+        (- aufnehmen mit Mikro)
