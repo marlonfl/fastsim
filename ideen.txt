@@ -10,3 +10,6 @@
         (- verschieden mit Rauschen überlagert)
         - verschiedene Bitrates
         (- aufnehmen mit Mikro)
+
+- Test: Accuracy für verschiedene Typen von Degradierungen und gesamt
+  
