@@ -8,7 +8,7 @@ import soundfile as sf
 
 SONG_POOL = ""
 LIMIT = 0.25
-N = 200
+N = 50
 
 def stft(x, fftsize, overlap):
     """Returns short time fourier transform of a signal x
@@ -22,12 +22,14 @@ def sim(s1, s2):
     return euclidean(gen_model(s1), gen_model(s2))
 
 def gen_model(song):
-    fft1 = np.absolute(stft(song, 32768, 2)).mean(axis=0)
+    fft1 = np.absolute(stft(song, 2048, 4)).mean(axis=0)
     fft1 /= max(fft1)
     return decimate(fft1.tolist(), N)
 
 def freq1_from_ogg_path(path):
-    raw = sf.read(path)[0][:,1]
+    raw = sf.read(path)[0]
+    if raw.ndim > 1:
+        raw = raw[:,1]
     fft = np.absolute(stft(raw, 32768, 2)).mean(axis=0)
     fft /= max(fft)
     return decimate(fft.tolist(), N)

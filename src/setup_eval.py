@@ -1,6 +1,10 @@
 import os
 import random
 import soundfile as sf
+import subprocess
+import scipy.io.wavfile as scw
+import time
+import numpy as np
 
 def lower_vol(song):
     return song * random.uniform(0.1, 0.8)
@@ -23,20 +27,45 @@ def downsample(song):
     return song[::2,::2]
 
 if __name__ == "__main__":
-    # os.makedirs("../testfiles/original")
-    # os.makedirs("../testfiles/lower_vol")
-    # os.makedirs("../testfiles/short_clips")
-    # os.makedirs("../testfiles/long_clips")
-    # os.makedirs("../testfiles/downsampled")
+    if not os.path.exists("../testfiles/original"):
+        os.makedirs("../testfiles/original")
+        os.makedirs("../testfiles/lower_vol")
+        os.makedirs("../testfiles/short_clips")
+        os.makedirs("../testfiles/long_clips")
+        os.makedirs("../testfiles/downsampled")
 
     for fn in os.listdir("../trainfiles/"):
-        print (fn)
         data, sample_rate = sf.read("../trainfiles/" + fn)
-        #sf.write("../testfiles/original/" + fn, data, sample_rate)
-        print (data)
-        d = lower_vol(data)
-        print (sample_rate)
-        sf.write("../testfiles/lower_vol/" + fn, d, sample_rate)
-        sf.write("../testfiles/short_clips/" + fn, short_clip(data), sample_rate)
-        sf.write("../testfiles/long_clips/" + fn, long_clip(data), sample_rate)
-        sf.write("../testfiles/downsampled/" + fn, downsample(data), int(sample_rate/2))
+
+        print (len(data))
+        wav_name = fn.replace(".ogg", ".wav")
+
+        scw.write("../testfiles/original/" + wav_name, sample_rate, data.astype(np.float32))
+        time.sleep(4)
+        os.system("oggenc -q 3 " + "../testfiles/original/" + wav_name)
+        time.sleep(4)
+        os.system("rm -f " + "../testfiles/original/" + wav_name)
+
+        scw.write("../testfiles/lower_vol/" + wav_name, sample_rate, lower_vol(data).astype(np.float32))
+        time.sleep(4)
+        os.system("oggenc -q 3 " + "../testfiles/lower_vol/" + wav_name)
+        time.sleep(4)
+        os.system("rm -f " + "../testfiles/lower_vol/" + wav_name)
+
+        scw.write("../testfiles/short_clips/" + wav_name, sample_rate, short_clip(data).astype(np.float32))
+        time.sleep(4)
+        os.system("oggenc -q 3 " + "../testfiles/short_clips/" + wav_name)
+        time.sleep(4)
+        os.system("rm -f " + "../testfiles/short_clips/" + wav_name)
+
+        scw.write("../testfiles/long_clips/" + wav_name, sample_rate, long_clip(data).astype(np.float32))
+        time.sleep(4)
+        os.system("oggenc -q 3 " + "../testfiles/long_clips/" + wav_name)
+        time.sleep(4)
+        os.system("rm -f " + "../testfiles/long_clips/" + wav_name)
+
+        scw.write("../testfiles/downsampled/" + wav_name, int(sample_rate/2), downsample(data).astype(np.float32))
+        time.sleep(4)
+        os.system("oggenc -q 3 " + "../testfiles/downsampled/" + wav_name)
+        time.sleep(4)
+        os.system("rm -f " + "../testfiles/downsampled/" + wav_name)
